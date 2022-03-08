@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<head>
+	<title>Attendance Rate by Class</title>
+	~[wc:commonscripts]
+	<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+	<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+<body>
+	~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt; Attendance Rate by Class<!-- breadcrumb end -->~[wc:admin_navigation_css]
+	<h1>Attendance Rate by Class</h1><!-- start of content and bounding box -->
+	<div class="box-round">
+	<center>Filter:<input type="text" id="susfilter" data-pstablefiltertarget="AttendanceRateTable"></center>
+	<table data-pstablefilter='{"timer":50}'  border="0" cellspacing="0" cellpadding="4" align="center" id="AttendanceRateTable" background="/images/transparent.gif">
+		<thead>
+				<tr class="psfilter-exclude">
+				<th class="bold" align="CENTER">Term</td>
+				<th class="bold" align="CENTER">Course Name</td>
+				<th class="bold" align="CENTER">Period</td>
+				<th class="bold" align="CENTER">Teacher's Name</td>
+				<th class="bold" align="CENTER">Attendance Rate</td>
+			</tr>
+		</thead
+		<tbody>
+    		~[tlist_sql;
+    		WITH 
+termdates AS (
+  SELECT
+    cc.id,
+    cc.dateenrolled,
+    CASE 
+        WHEN cc.dateleft>SYSDATE
+          THEN SYSDATE
+        ELSE cc.dateleft
+    END AS dateleft
+    
+  FROM cc
+  
+  WHERE 
+    ABS(cc.termid) IN (SELECT tr.id FROM terms tr WHERE tr.yearid=~(curyearid))
+    AND cc.schoolid=~(curschoolid)
+    AND cc.dateenrolled<SYSDATE
+),
+
+ccdata AS (
+  SELECT
+    cc.id,
+    cc.schoolid,
+    cc.sectionid,    
+    cc.currentabsences,
+    (SELECT COUNT (cd.id) FROM calendar_day cd WHERE cd.date_value<=termdates.dateleft AND cd.date_value>=termdates.dateenrolled AND cd.schoolid=cc.schoolid AND cd.membershipvalue!=0) AS daysinclass
+  
+  FROM cc
+  INNER JOIN termdates ON termdates.id=cc.id
+),
+
+section_data AS (
+  SELECT
+    sccd.sectionid,
+    SUM(sccd.currentabsences) AS absences,
+    SUM(sccd.daysinclass) AS daysinclass
+  
+  FROM ccdata sccd
+  
+  GROUP BY sccd.sectionid
+)
+
+SELECT DISTINCT
+  tr.name,
+  cr.course_name,
+  sec.expression,
+  u.lastfirst,
+  ROUND(((sd.daysinclass-sd.absences)/(sd.daysinclass)*100),2)||'%'
+  
+FROM section_data sd
+JOIN sections sec ON sec.id=sd.sectionid
+JOIN courses cr ON cr.course_number=sec.course_number
+JOIN schoolstaff ss ON ss.id=sec.teacher
+JOIN users u ON u.dcid=ss.users_dcid
+JOIN terms tr ON tr.id=sec.termid
+
+WHERE 
+  cr.exclude_ada!=1
+
+ORDER BY tr.name,u.lastfirst,sec.expression,cr.course_name
+        	;alternatecolor]
+   			 <tr bgcolor="#edf3fe">
+ 				<td align="LEFT">~(term;t)</td>
+    			<td align="LEFT">~(coursename;t)</td>
+    			<td align="LEFT">~(period;T)</td>
+ 				<td align="LEFT">~(teachername;t)</td>
+    			<td align="LEFT">~(attendancerate;t)</td>
+    		</tr>
+			[/tlist_sql]
+		</tbody>
+	</table>
+	</div>
+<!-- end of content of bounding box -->
+~[wc:admin_footer_css]
+</body>
+</html><!-- non framed -->

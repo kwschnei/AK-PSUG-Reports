@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<!-- start right frame -->
+<head>
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/students/modifydata.html" -->
+
+<title>Yearly Attendance Breakdown</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<body>
+
+~[wc:admin_header_frame_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_students.modifydata.start_page]</a> &gt; <a href="home.html?selectstudent=nosearch" target="_top">~[text:psx.html.admin_students.modifydata.student_selection]</a> &gt; <a href="historicalAttendance.html?frn=~(studentfrn)">Historical Attendance</a> &gt; Yearly Attendance Breakdown<!-- breadcrumb end -->~[wc:admin_navigation_frame_css]
+
+~[wc:title_student_begin_css]Yearly Attendance Breakdown~[wc:title_student_end_css]
+<!-- start of content and bounding box -->
+<fieldset>
+	<legend>~[gpv:yearname] Attendance by Weekday</legend>
+	<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+		<tr bgcolor="#f6f6f6">
+			<td align="left">Day</td>
+			<td align="left">Attendance Rate</td> 
+			<td align="left">Days Enrolled</td> 
+			<td align="left">Days Absent</td>
+		</tr>
+	~[tlist_sql;
+		SELECT
+		  to_char(adm.calendardate,'Day'),
+		  ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)||'%' AS rate,
+		  SUM(adm.studentmembership) AS membership,
+		  SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+		  
+		FROM ps_membership_reg adm
+		
+		JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+		JOIN students s on s.id=adm.studentid
+		
+		WHERE
+		  adm.calendardate<=SYSDATE
+		  AND adm.yearid=~[gpv:year]
+		  AND s.id=~(curstudid)
+		
+		GROUP BY to_char(adm.calendardate,'D'),to_char(adm.calendardate,'Day')
+		
+		ORDER BY to_char(adm.calendardate,'D')
+	;alternatecolor]
+    	<tr bgcolor="#edf3fe">
+    		<td align="LEFT">~(month)</td>
+    		<td align="LEFT">~(rate)</td>
+    		<td align="LEFT">~(enrolled)</td>
+    		<td align="LEFT">~(absent)</td>
+    	</tr>
+	[/tlist_sql]
+	</table>
+</fieldset>
+<fieldset>
+	<legend>~[gpv:yearname] Attendance by Month</legend>
+	<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+		<tr bgcolor="#f6f6f6">
+			<td align="left">Month</td>
+			<td align="left">Attendance Rate</td> 
+			<td align="left">Days Enrolled</td> 
+			<td align="left">Days Absent</td>
+		</tr>
+	~[tlist_sql;
+		SELECT
+		  to_char(adm.calendardate,'Month'),
+		  ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)||'%' AS rate,
+		  SUM(adm.studentmembership) AS membership,
+		  SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+		  
+		FROM ps_membership_reg adm
+		
+		JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+		JOIN students s on s.id=adm.studentid
+		
+		WHERE
+		  adm.calendardate<=SYSDATE
+		  AND adm.yearid=~[gpv:year]
+		  AND s.id=~(curstudid)
+		
+		GROUP BY to_char(adm.calendardate,'YY,MM'),to_char(adm.calendardate,'Month')
+		
+		ORDER BY to_char(adm.calendardate,'YY,MM')
+	;alternatecolor]
+    	<tr bgcolor="#edf3fe">
+    		<td align="LEFT">~(month)</td>
+    		<td align="LEFT">~(rate)</td>
+    		<td align="LEFT">~(enrolled)</td>
+    		<td align="LEFT">~(absent)</td>
+    	</tr>
+	[/tlist_sql]
+	</table>
+</fieldset>
+<fieldset>
+	<legend>~[gpv:yearname] Absences</legend>
+	<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+		<tr bgcolor="#f6f6f6">
+			<td align="left">Date</td>
+			<td align="left">Period</td> 
+			<td align="left">Course</td> 
+			<td align="left">Attendance Code</td>
+			<td align="left">Comment</td>
+		</tr>
+	~[tlist_sql;
+		SELECT
+			to_char(att.att_date,'MM/DD/YYYY'),
+			p.period_number,
+			c.course_name,
+			attc.att_code,
+			att.att_comment
+
+		FROM attendance att
+		JOIN students s ON s.id=att.studentid
+		JOIN cc ON cc.id=att.ccid
+		JOIN courses c ON c.course_number=cc.course_number
+		JOIN period p ON p.id=att.periodid
+		JOIN attendance_code attc ON attc.id=att.attendance_codeid
+
+		WHERE
+			att.yearid=~[gpv:year]
+			AND s.id=~(curstudid)
+			AND (attc.att_code IS NOT NULL OR att.att_comment IS NOT NULL)
+	
+		ORDER BY att.att_date,p.period_number
+	;alternatecolor]
+    	<tr bgcolor="#edf3fe">
+    		<td align="LEFT">~(date)</td>
+    		<td align="LEFT">~(period)</td>
+    		<td align="LEFT">~(course)</td>
+    		<td align="LEFT">~(code)</td>
+    		<td align="LEFT">~(comment)</td>
+    	</tr>
+	[/tlist_sql]
+	</table>
+</fieldset>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_frame_css]
+</form>
+
+</body>
+</html><!-- end right frame -->

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<head>
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/reports/teacherverification.html" -->
+
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/teacherverification.html" -->
+
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/studentlist/feefunctions.html" -->
+
+
+
+
+<title>Students with Low Grades</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt;Students with Low Grades<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>Students with Low Grades</h1>
+<h3>Classes in which students have a D or F and the number of attendance events.</h3><!-- start of content and bounding box -->
+<div class="box-round">
+
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<tr bgcolor="#f6f6f6">
+<td align="left">Student</td>
+<td align="left">Course Name</td>
+<td align="center">Teacher</td>
+<td align="center">% Grade</td>
+<td align="center">Letter Grade</td>
+<td align="center">Absences</td>
+</tr>
+
+~[tlist_sql;
+SELECT
+   s.lastfirst AS "Student Name",
+   cr.course_name AS "Course Name",
+   t.lastfirst AS "Teacher Name",
+   pgfg.percent AS "Grade",
+   pgfg.grade AS "Letter Grade",
+   (SELECT COUNT(ATT.ID) FROM ATTENDANCE ATT, ATTENDANCE_CODE AC
+WHERE AC.ID = ATT.ATTENDANCE_CODEID AND ATT.STUDENTID = S.ID AND ATT.CCID = CC.ID AND AC.presence_status_CD = 'Absent')
+   
+   
+FROM pgfinalgrades pgfg
+JOIN students s ON s.id=pgfg.studentid
+JOIN sections sec ON sec.id=pgfg.sectionid
+JOIN cc ON cc.sectionid=sec.id AND cc.studentid=s.id
+JOIN courses cr ON cr.course_number=sec.course_number
+JOIN teachers t ON t.id=cc.teacherid
+
+WHERE  s.enroll_status=0
+  AND cc.termid IN (SELECT tr.id FROM terms tr WHERE tr.schoolid = sec.schoolid AND tr.yearid=~(curyearid) AND tr.firstday < = SYSDATE-10 AND tr.lastday >= SYSDATE-10)
+  AND pgfg.finalgradename=(SELECT tr.abbreviation FROM terms tr WHERE tr.schoolid = sec.schoolid AND tr.id=~(curtermid))
+  AND pgfg.grade in ('F','D-','D','D+')
+  AND s.schoolid=~(curschoolid)
+
+ORDER BY 1,2
+        ;alternatecolor]
+    <tr bgcolor="#edf3fe">
+    <td align="left">~(s.lastfirst;t)</td>
+    <td align="left">~(cr.coursename;t)</td>
+    <td align="center">~(t.lastfirst;t)</td>
+    <td align="center">~(pgfg.percent;t)%</td>
+    <td align="center">~(pgfg.grade;t)</td>
+    <td align="center">~(absences;t)</td>
+    </tr>
+[/tlist_sql]
+</table>
+<br>
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

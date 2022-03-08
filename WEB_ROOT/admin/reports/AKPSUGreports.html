@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<head>
+<title>AKPSUG Reports</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; AKPSUG Reports<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>AKPSUG Reports</h1>~[SetPostValue:repType=AKPSUG]
+~[x:insertfile;reporttabs.html]
+
+<!-- start of content and bounding box -->
+<div class="box-round">
+~[if.is.a.school]
+<table border="0" cellspacing="0" cellpadding="4" width=100%>
+	<tr bgcolor="#f6f6f6">
+		<td class="bold">Attendance</td>
+		<td class="bold">Description</td>
+	</tr>
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/Tardies_by_class.html">Number of Tardies by Class</a></td>
+		<td align="left">The report lists number of student tardies per class.</td>
+	</tr>
+
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/attendance_rate-by_grade_level.html">Grade Level Attendance Rate by Term</a></td>
+		<td align="left">The report calculates the attendance rate of each grade level by term. For the most up-to-date information, <a href="../reports_engine/report_w_param.html?ac=reports_get_using_ID;repo_ID=ATT_RefreshPremierMembrDefaults" target="_blank">refresh the attendance views</a> first.</td>
+	</tr>
+
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/attendance_rate-by_class.html">Attendance Rate by Class</a></td>
+		<td align="left">The report calculates the attendance rate of each class.</td>
+	</tr>
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/ChronicAbsenteeism.html">Chronic Absenteeism</a></td>
+		<td align="left">This report lists students by their attendance categories.</td>
+	</tr>
+[/if]
+
+
+<table border="0" cellspacing="0" cellpadding="4" width=100%>
+	<tr bgcolor="#f6f6f6">
+		<td class="bold">Enrollment</td>
+		<td class="bold">Description</td>
+	</tr>
+	~[if.is.a.school]
+	<tr class="~[evenoddrow]">
+		<TD width="275"><a href="/admin/reports/AKPSUG/newstudentreport.html">New Student List</a></td>
+		<td align="left">The report lists students who have enrolled after school started.</td>
+	</tr>
+	
+	<tr class="~[evenoddrow]">
+		<td width="275"><a href="/admin/reports/AKPSUG/transferstudents.html">Transfer Students Report</a></td>
+		<td align="left">This report lists all students who have transferred out of school this year.</td>
+	</tr>
+	[/if]
+	<tr class="~[evenoddrow]">
+		<td width="275"><a href="/admin/reports/AKPSUG/enrollmentWithFTE.html">Enrollment Report</a></td>
+		<td align="left">Enrollment counts (and FTE) based upon a given day.</td>
+	</tr>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="4" width=100%>
+	<tr bgcolor="#f6f6f6">
+		<td class="bold">Grades</td>
+		<td class="bold">Description</td>
+	
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/gradebookupdatereport.html?days=8">Gradebooks Not Updated Report (Java grade book)</a></td>
+		<td align="left">The report lists teachers who have not updated their <b>Java</b> grade book in the last week. This report will not work for sections using the PowerTeacher Pro grade book.</td>
+	</tr>
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/gradebookupdatereportPTP.html?days=8">Gradebooks Not Updated Report PTP</a></td>
+		<td align="left">The report lists teachers who have not updated their <b>PowerTeacher Pro</b> Gradebook in the last week. This report will not work for sections using the Java grade book.</td>
+	</tr>
+	~[if.is.a.school]
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/gradebookupdatereport-students.html">Gradebooks Not Updated Report (Java grade book), Student List</a></td>
+		<td align="left">The report lists the students who have not had their grades updated in the last week (in the <b>Java</b> grade book). This report will not work for sections using the PowerTeacher Pro grade book.</td>
+	</tr>
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/gradebookupdatereportPTP-students.html">Gradebooks Not Updated Report (PTP), Student List</a></td>
+		<td align="left">The report lists the students who have not had their grades updated in the last week (<b>in the PowerTeacher Pro</b> grade book). This report will not work for sections using the Java grade book.</td>
+	</tr>
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/DandF_report.html">Students with Ds and Fs</a></td>
+		<td align="left">Lists classes in which students have a D or F and attendance totals.</td>
+	</tr>
+	
+	[/if]
+</table>
+
+<table border="0" cellspacing="0" cellpadding="4" width=100%>
+	<tr bgcolor="#f6f6f6">
+		<td class="bold">Graduation</td>
+		<td class="bold">Description</td>
+	~[if.is.a.school]
+	<tr class="~[evenoddrow]">
+		<TD WIDTH="275"><a href="/admin/reports/AKPSUG/PotentialGraduateLowGrades.html">Potential Graduates with Low Grades</a></td>
+		<td align="left">Lists classes in which potential graduates have a D or F.</td>
+	</tr>
+	[/if]
+</table>
+
+~[if.district.office]
+<table border="0" cellspacing="0" cellpadding="4" width=100%>
+	<tr bgcolor="#f6f6f6">
+		<td class="bold">Graduation</td>
+		<td class="bold">Description</td>
+	~[if.is.a.school]
+	<tr class="~[evenoddrow]">
+	<TD WIDTH="275"><a href="/admin/reports/AKPSUG/DataExports/PEAKS_Multiple_Students_Upload.csv">PEAKS - Multiple Students Upload</a></td>
+	<td align="left">Download an import file of students for the PEAKS test.</td>
+	</tr>
+	[/if]
+</table>
+[/if]
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

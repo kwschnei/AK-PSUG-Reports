@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+@-moz-document url-prefix() {#inputDays {width: 25px; }}
+</style>
+
+<title>Gradebook Update Report PTP</title>
+<meta name="description" content="Displays a listing of sections by teacher that have not had their gradebooks recently updated">
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+<script>
+//Find results
+function find()
+{
+var org = document.getElementById('inputDays').value;
+//Test if input is valid int
+var intRegex = /^\d+$/;
+if (intRegex.test(org))
+	{
+		//Reload page w/new org variable
+		window.location.href = 'gradebookupdatereportPTP.html?days=' + org;
+	}
+else 
+	{alert('Please enter a valid whole number and try again');}
+}
+</script>
+</head>
+<body>
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt; Gradebook Not Updated PTP<!-- breadcrumb end -->~[wc:admin_navigation_css]
+<h1>Gradebook Update Report PTP</h1><!-- start of content and bounding box -->
+<p>Look for teachers by class that have not updated their gradebook in <input id="inputDays" type="number" min="1" max="999" value="~[gpv:days]"> or more days. <button onclick="find()">Find</button></p>
+<div class="box-round">
+<!-- Generate results for district office level -->
+~[if#VarCheck.~(curschoolid)=0]
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<thead>
+	<tr class="headerRow">
+		<th class="bold">School</th>
+		<th class="bold">Teacher</th>
+		<th class="bold">Course Number</th>
+		<th class="bold">Course</th>
+		<th class="bold">Section</th>
+		<th class="bold">Enrolled</th>
+		<th class="bold">Last Updated</th>
+	</tr>
+</thead>
+<tbody>
+	~[tlist_sql;
+	WITH sectionsupdated AS (
+  SELECT 
+   TRUNC(MAX(ass.whenmodified)) AS moddate,
+   asssec.sectionsdcid as sectionsdcid
+
+  FROM assignmentsection asssec 
+  JOIN assignmentscore ass ON ass.assignmentsectionid=asssec.assignmentsectionid
+  JOIN sections sec ON sec.dcid=asssec.sectionsdcid
+
+  WHERE
+	sec.termid IN (SELECT trx.id FROM terms trx WHERE trx.schoolid = sec.schoolid AND trx.firstday < = TRUNC(SYSDATE) AND trx.lastday >= TRUNC(SYSDATE))
+
+  GROUP BY asssec.sectionsdcid
+
+  ORDER BY asssec.sectionsdcid
+)
+
+SELECT DISTINCT 
+  s.name AS "School Name",
+  t.lastfirst AS "Teacher Name",
+  c.course_number AS "Course Number",
+  c.course_name AS "Course Name",
+  sec.section_number AS "Section Number",
+  sec.no_of_students AS "Number of Enrolled Students",
+  CASE
+	WHEN secup.moddate IS NOT NULL
+	THEN to_char(secup.moddate,'MM/DD/YYYY')
+	ELSE 'Never'
+  END as "Last Updated"
+
+FROM sections sec
+
+JOIN teachers t on t.id = sec.teacher
+JOIN courses c on c.course_number = sec.course_number
+JOIN terms tr on tr.id = sec.termid
+JOIN schools s on t.schoolid = s.school_number
+LEFT OUTER JOIN sectionsupdated secup ON secup.sectionsdcid=sec.dcid
+
+WHERE 
+  tr.schoolid = sec.schoolid
+  AND sec.termid IN (SELECT trx.id FROM terms trx WHERE trx.schoolid = sec.schoolid AND trx.firstday < = TRUNC(SYSDATE) AND trx.lastday >= TRUNC(SYSDATE))
+  AND (secup.moddate < TRUNC(SYSDATE - ~[gpv:days]) OR secup.moddate IS NULL)
+  AND lower(c.course_name) NOT LIKE '%am%'
+  AND lower(c.course_name) NOT LIKE '%pm%'
+  AND lower(c.course_name) NOT LIKE '%advisory%'
+  AND lower(c.course_name) NOT LIKE '%study hall%'
+  AND lower(c.course_name) NOT LIKE '%behavior%'
+  AND lower(c.course_name) NOT LIKE '%caseload%'
+  AND sec.excludefromstoredgrades != 1
+  AND (c.excludefromstoredgrades = 0 AND sec.excludefromstoredgrades IN (0,2))
+  AND sec.no_of_students>0
+
+ORDER BY
+  s.name,
+  t.lastfirst,
+  c.course_name,
+  sec.section_number
+;alternatecolor]
+<span style="display: none;">~(school) ~(name) ~(course_number) ~(course_name) ~(section_number) ~(enroll) ~(lastgradeupdate)</span>
+<tr bgcolor="#edf3fe">
+<td align="left">~(school)</td>
+<td align="left">~(name)</td>
+<td align="left">~(course_number)</td>
+<td align="left">~(course_name)</td>
+<td align="left">~(section_number)</td>
+<td align="left">~(enroll)</td>
+<td align="center">~(lastgradeupdate)</td>
+</tr>
+[/tlist_sql]</tbody>
+</table>
+<!-- Generate results for a specific school -->
+[else#VarCheck]
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<thead>
+	<tr class="headerRow">
+		<th class="bold">School</th>
+		<th class="bold">Teacher</th>
+		<th class="bold">Course Number</th>
+		<th class="bold">Course</th>
+		<th class="bold">Section</th>
+		<th class="bold">Enrolled</th>
+		<th class="bold">Last Updated</th>
+	</tr>
+</thead>
+<tbody>
+	~[tlist_sql;
+	WITH sectionsupdated AS (
+  SELECT 
+   TRUNC(MAX(ass.whenmodified)) AS moddate,
+   asssec.sectionsdcid as sectionsdcid
+
+  FROM assignmentsection asssec 
+  JOIN assignmentscore ass ON ass.assignmentsectionid=asssec.assignmentsectionid
+  JOIN sections sec ON sec.dcid=asssec.sectionsdcid
+
+  WHERE
+	sec.termid IN (SELECT trx.id FROM terms trx WHERE trx.schoolid = sec.schoolid AND trx.firstday < = TRUNC(SYSDATE) AND trx.lastday >= TRUNC(SYSDATE))
+
+  GROUP BY asssec.sectionsdcid
+
+  ORDER BY asssec.sectionsdcid
+)
+
+SELECT DISTINCT 
+  s.name AS "School Name",
+  t.lastfirst AS "Teacher Name",
+  c.course_number AS "Course Number",
+  c.course_name AS "Course Name",
+  sec.section_number AS "Section Number",
+  sec.no_of_students AS "Number of Enrolled Students",
+  CASE
+	WHEN secup.moddate IS NOT NULL
+	THEN to_char(secup.moddate,'MM/DD/YYYY')
+	ELSE 'Never'
+  END as "Last Updated"
+
+FROM sections sec
+
+JOIN teachers t on t.id = sec.teacher
+JOIN courses c on c.course_number = sec.course_number
+JOIN terms tr on tr.id = sec.termid
+JOIN schools s on t.schoolid = s.school_number
+LEFT OUTER JOIN sectionsupdated secup ON secup.sectionsdcid=sec.dcid
+
+WHERE 
+  tr.schoolid = sec.schoolid
+  AND sec.termid IN (SELECT trx.id FROM terms trx WHERE trx.schoolid = sec.schoolid AND trx.firstday < = TRUNC(SYSDATE) AND trx.lastday >= TRUNC(SYSDATE))
+  AND (secup.moddate < TRUNC(SYSDATE - ~[gpv:days]) OR secup.moddate IS NULL)
+  AND lower(c.course_name) NOT LIKE '%am%'
+  AND lower(c.course_name) NOT LIKE '%pm%'
+  AND lower(c.course_name) NOT LIKE '%advisory%'
+  AND lower(c.course_name) NOT LIKE '%study hall%'
+  AND lower(c.course_name) NOT LIKE '%behavior%'
+  AND lower(c.course_name) NOT LIKE '%caseload%'
+  AND sec.excludefromstoredgrades != 1
+  AND (c.excludefromstoredgrades = 0 AND sec.excludefromstoredgrades IN (0,2))
+  AND sec.no_of_students>0
+  AND s.school_number in (~(curschoolid),~(curschoolid)-1,~(curschoolid)+1)
+
+ORDER BY
+  s.name,
+  t.lastfirst,
+  c.course_name,
+  sec.section_number
+;alternatecolor]
+<span style="display: none;">~(school) ~(name) ~(course_number) ~(course_name) ~(section_number) ~(enroll) ~(lastgradeupdate)</span>
+<tr bgcolor="#edf3fe">
+<td align="left">~(school)</td>
+<td align="left">~(name)</td>
+<td align="left">~(course_number)</td>
+<td align="left">~(course_name)</td>
+<td align="left">~(section_number)</td>
+<td align="left">~(enroll)</td>
+<td align="center">~(lastgradeupdate)</td>
+</tr>
+[/tlist_sql]
+</tbody>
+</table>
+[/if#VarCheck]
+<br>
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+~[wc:admin_footer_css]
+</body>
+</html>

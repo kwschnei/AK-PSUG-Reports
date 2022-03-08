@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/reports/delinquentteacherreport.html" -->
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/teacherverification.html" -->
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/studentlist/feefunctions.html" -->
+
+<title>Gradebook Not Updated PTP - Student Report</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt; Non-updated Student Grades PTP<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>Gradebook Not Updated PTP - Student Report</h1><!-- start of content and bounding box -->
+<div class="box-round">
+
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<tr bgcolor="#f6f6f6">
+<td align="left">Teacher</td>
+<td align="left">Course</td>
+<td align="left">Section</td>
+<td align="left">Student</td>
+<td align="left">Last Updated</td>
+</tr>
+
+     ~[tlist_sql;
+     WITH sectionsupdated AS (
+  SELECT 
+   TRUNC(MAX(ass.whenmodified)) AS moddate,
+   asssec.sectionsdcid AS sectionsdcid,
+   ass.studentsdcid AS studentsdcid
+  
+  FROM assignmentsection asssec 
+  JOIN assignmentscore ass ON ass.assignmentsectionid=asssec.assignmentsectionid
+  JOIN sections sec ON sec.dcid=asssec.sectionsdcid
+  
+  WHERE
+    sec.termid IN (SELECT trx.id FROM terms trx WHERE trx.schoolid = sec.schoolid AND trx.firstday < = TRUNC(SYSDATE) AND trx.lastday >= TRUNC(SYSDATE))
+  
+  GROUP BY asssec.sectionsdcid,ass.studentsdcid
+  
+  ORDER BY asssec.sectionsdcid,ass.studentsdcid
+)
+
+SELECT DISTINCT 
+  t.lastfirst AS "Teacher Name",
+  c.course_name AS "Course Name",
+  sec.section_number AS "Section Number",
+  s.lastfirst AS "Student Name",
+  CASE
+    WHEN secup.moddate IS NOT NULL
+    THEN to_char(secup.moddate,'MM/DD/YYYY')
+    ELSE 'Never'
+  END as "Last Updated"
+
+FROM cc
+
+JOIN students s ON s.id=cc.studentid
+JOIN sections sec ON sec.id=cc.sectionid
+LEFT OUTER JOIN sectionsupdated secup ON secup.studentsdcid=s.dcid AND secup.sectionsdcid=sec.dcid
+JOIN teachers t on t.id = sec.teacher
+JOIN courses c on c.course_number = sec.course_number
+
+WHERE 
+  cc.termid IN (SELECT trx.id FROM terms trx WHERE trx.schoolid = cc.schoolid AND trx.firstday < = TRUNC(SYSDATE) AND trx.lastday >= TRUNC(SYSDATE))
+  AND (secup.moddate < TRUNC(SYSDATE - 15) OR secup.moddate IS NULL)
+  AND lower(c.course_name) NOT LIKE '%am%'
+  AND lower(c.course_name) NOT LIKE '%pm%'
+  AND lower(c.course_name) NOT LIKE '%advisory%'
+  AND lower(c.course_name) NOT LIKE '%study hall%'
+  AND lower(c.course_name) NOT LIKE '%behavior%'
+  AND lower(c.course_number) NOT LIKE '%caseload%'
+  AND sec.excludefromstoredgrades != 1
+  AND (c.excludefromstoredgrades = 0 AND sec.excludefromstoredgrades IN (0,2))
+  AND s.schoolid=~(curschoolid)
+
+ORDER BY
+  t.lastfirst,
+  c.course_name,
+  sec.section_number,
+  s.lastfirst
+        ;alternatecolor]
+    <tr bgcolor="#edf3fe">
+<td align="LEFT">~(T.LASTFIRST;T)</td>
+    <td align="LEFT">~(C.COURSE_NAME;T)</td>
+ <td align="LEFT">~(CC.SECTION_NUMBER;T)</td>
+ <td align="LEFT">~(S.LASTFIRST;T)</td>
+    <td align="CENTER">~(CC.LASTGRADEUPDATE;T)</td>
+
+
+    </tr>
+[/tlist_sql]
+</table>
+<br>
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

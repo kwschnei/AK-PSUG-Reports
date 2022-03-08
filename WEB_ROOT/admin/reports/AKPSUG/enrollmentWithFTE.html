@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+<title>Enrollment Summary</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+<script language="JavaScript">
+
+</script>
+<style>
+	@media print {
+		div#dateControl {display: none;}
+	}
+	table#EnrollSummary {border-collapse: collapse;}
+	table#EnrollSummary td,th {border: 1px solid black;}
+	input.psDateWidget {margin: 0 0 10px 10px;}
+</style>
+</head>
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/APPSUGreports.html">AK PSUG Reports</a> &gt;Enrollment Summary<!-- breadcrumb end -->~[wc:admin_navigation_css]
+<h1>Enrollment Summary - ~[gpv:date]</h1>
+<div class="box-round" id="dateControl">
+<h2>Calculate enrollments as of:</h2>
+<input type="text" class="psDateWidget" size="10" value="~[gpv:date]">
+</div>
+<div class="">
+<table id="EnrollSummary">
+<tr>
+	<th>School</th>
+	<th>Total</th>
+~[if.district.office]
+	~[tlist_sql;
+		select  distinct
+				grade_level
+		from    students s
+		join    schools sch
+		on      s.schoolid = sch.school_number
+		where   s.grade_level between sch.low_grade and sch.high_grade
+		order by 1]
+	<th>~(kp_grade_level)</th>
+	[/tlist_sql]
+</tr>
+	~[tlist_sql;
+		with studentcounts
+		as
+		(
+			select  pe.schoolid
+					,pe.grade_level
+					,count(*) as student_count
+					,sum(f.fte_value) as fteval
+			from    ps_enrollment_reg pe
+			join    fte f
+			on      f.id = pe.fteid
+			where   to_date('~[gpv:date]','MM/DD/YYYY') between pe.entrydate and pe.exitdate -1
+			group by pe.schoolid,pe.grade_level
+		)
+
+		select  sch.name
+				,gl.grade_level
+				,sc.student_count as student_count
+				,case when nvl(sc.student_count,0) <> nvl(sc.fteval,0) then '<br />(' || nvl(sc.fteval,0) || ')' end as fteval
+				,row_number() over(partition by sch.abbreviation order by gl.grade_level) as start_school
+				,row_number() over(partition by sch.abbreviation order by gl.grade_level desc) as end_school
+				,(select sum(student_count) from studentcounts where schoolid = sch.school_number) as total_students
+				,(select sum(fteval) from studentcounts where schoolid = sch.school_number) as total_fteval
+		from    schools sch
+		join    (
+				select  distinct
+						grade_level
+				from    students s
+				join    schools sch
+				on      s.schoolid = sch.school_number
+				where   s.grade_level between sch.low_grade and sch.high_grade
+				) gl
+		on      gl.grade_level is not null
+		left outer join
+				studentcounts sc
+		on      sch.school_number = sc.schoolid
+			and gl.grade_level = sc.grade_level
+		where	exists (select schoolid from students where schoolid = sch.school_number and enroll_status = 0 and rownum < = 1)
+		order by sch.name,gl.grade_level
+	]
+	<span style="display: none;">~(school_abbr) ~(grade_level) ~(student_count) ~(fteval) ~(begin_school) ~(end_school) ~(total_students) ~(total_fteval)</span>
+	~(begin_school;l;if.test=1;then=<tr><td>~(school_abbr)</td><td>~(total_students;l;if.test=~(total_fteval);then=~(total_students);else=~(total_students)<br />(~(total_fteval));)</td><td>~(student_count) ~(fteval)</td>;else=<td>~(student_count) ~(fteval);)
+	~(end_school;l;if.test=1;then=</tr>;else=;)
+	[/tlist_sql]
+	~[tlist_sql;
+		WITH studentcounts AS (
+			SELECT  pe.schoolid
+					,pe.grade_level
+					,COUNT(*) AS student_count
+					,SUM(f.fte_value) AS fteval
+			FROM    ps_enrollment_reg pe
+			JOIN    fte f
+			ON      f.id = pe.fteid
+			WHERE   TO_DATE('~[gpv:date]','MM/DD/YYYY') BETWEEN pe.entrydate AND pe.exitdate -1
+			GROUP BY pe.schoolid,pe.grade_level
+		),
+		chart AS (
+			SELECT
+			  'Totals' AS label,
+			  sc.grade_level,
+			  SUM(sc.student_count) AS scount,
+			  CASE 
+				WHEN nvl(SUM(sc.student_count),0) <> nvl(SUM(sc.fteval),0) 
+				THEN'<br />(' || nvl(SUM(sc.fteval),0) || ')' 
+			  END AS fteval,
+			  sc.grade_level+3 AS start_school,
+			  13-sc.grade_level AS end_school,
+			  (SELECT SUM(student_count) FROM studentcounts) AS total_students,
+			  (SELECT SUM(fteval) FROM studentcounts) AS total_fteval
+  
+			FROM studentcounts sc
+
+			GROUP BY sc.grade_level
+
+			ORDER BY sc.grade_level
+		)
+		SELECT
+			label,
+			grade_level,
+			scount,
+			fteval,
+			rownum,
+			(SELECT MAX(rownum) FROM chart)-rownum+1,
+			total_students,
+			total_fteval
+			
+		FROM chart]
+		<span style="display: none;">~(school_abbr) ~(grade_level) ~(student_count) ~(fteval) ~(begin_school) ~(end_school) ~(total_students) ~(total_fteval)</span>
+		~(begin_school;l;if.test=1;then=<tr><td><b>~(school_abbr):</b></td><td>~(total_students;l;if.test=~(total_fteval);then=~(total_students);else=~(total_students)<br />(~(total_fteval));)</td><td>~(student_count) ~(fteval)</td>;else=<td>~(student_count) ~(fteval);)
+	~(end_school;l;if.test=1;then=</tr>;else=;)
+	[/tlist_sql]
+[/if]
+~[if.is.a.school]
+~[tlist_sql;
+		select  distinct
+				grade_level
+		from    students s
+		join    schools sch
+		on      s.schoolid = sch.school_number
+		where   s.grade_level between sch.low_grade and sch.high_grade
+		order by 1]
+	<th>~(kp_grade_level)</th>
+	[/tlist_sql]
+</tr>
+	~[tlist_sql;
+with studentcounts
+		as
+		(
+			select  pe.schoolid
+					,pe.grade_level
+					,count(*) as student_count
+					,sum(f.fte_value) as fteval
+			from    ps_enrollment_reg pe
+			join    fte f
+			on      f.id = pe.fteid
+			where   to_date('~[gpv:date]','MM/DD/YYYY') between pe.entrydate and pe.exitdate -1
+			group by pe.schoolid,pe.grade_level
+		)
+
+		select  sch.name
+				,gl.grade_level
+				,sc.student_count as student_count
+				,case when nvl(sc.student_count,0) <> nvl(sc.fteval,0) then '<br />(' || nvl(sc.fteval,0) || ')' end as fteval
+				,row_number() over(partition by sch.abbreviation order by gl.grade_level) as start_school
+				,row_number() over(partition by sch.abbreviation order by gl.grade_level desc) as end_school
+				,(select sum(student_count) from studentcounts where schoolid = sch.school_number) as total_students
+				,(select sum(fteval) from studentcounts where schoolid = sch.school_number) as total_fteval
+		from    schools sch
+		join    (
+				select  distinct
+						grade_level
+				from    students s
+				join    schools sch
+				on      s.schoolid = sch.school_number
+				where   s.grade_level between sch.low_grade and sch.high_grade
+				) gl
+		on      gl.grade_level is not null
+		left outer join
+				studentcounts sc
+		on      sch.school_number = sc.schoolid
+			and gl.grade_level = sc.grade_level
+		where	exists (select schoolid from students where schoolid in sch.school_number and enroll_status = 0 and rownum < = 1)
+    AND sch.school_number in (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+		order by sch.name,gl.grade_level
+		]
+	<span style="display: none;">~(school_abbr) ~(grade_level) ~(student_count) ~(fteval) ~(begin_school) ~(end_school) ~(total_students) ~(total_fteval)</span>
+	~(begin_school;l;if.test=1;then=<tr><td>~(school_abbr)</td><td>~(total_students;l;if.test=~(total_fteval);then=~(total_students);else=~(total_students)<br />(~(total_fteval));)</td><td>~(student_count) ~(fteval)</td>;else=<td>~(student_count) ~(fteval);)
+	~(end_school;l;if.test=1;then=</tr>;else=;)
+	[/tlist_sql]
+[/if]
+
+
+</table>
+<script>
+	jQuery("table#EnrollSummary tr:odd").css("background-color","#D7EBF4");
+	jQuery("table#EnrollSummary tr td,th").not(':first-child').css("text-align","center");
+	jQuery("input.psDateWidget").change(function() {
+		var selDate = jQuery(this).val();
+		window.location.replace("enrollmentWithFTE.html?date=" + selDate);
+	});
+</script>
+</div>
+~[wc:admin_footer_css]
+</body>
+</html><!-- non framed -->

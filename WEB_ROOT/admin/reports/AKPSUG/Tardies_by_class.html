@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<head>
+
+
+
+<title>Tardies by Class</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+
+<script language="JavaScript" src="/admin/JavaScript/OpenDocInWindow.js"></script>
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt; Tardies By Class<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>Tardies by Class</h1><!-- start of content and bounding box -->
+<div class="box-round">
+
+<table border="0" cellspacing="0" cellpadding="4" width="450">
+<tr bgcolor="#f6f6f6">
+	<td class="bold">School</td>
+	<td class="bold">Teacher</td>
+	<td class="bold">Class</td>
+	<td class="bold">Period</td>
+	<td class="bold"># of Students</td>
+	<td class="bold"># Tardies</td>
+</tr>
+	~[tlist_sql;
+	SELECT
+		sch.abbreviation "School",
+		t.lastfirst "Teacher",
+		c.COURSE_NAME "Class",
+		cc.expression "Period",
+		sec.no_of_students "# of Students",
+		count (*) "Tardies"
+
+	FROM students s
+
+	JOIN schools sch ON sch.school_number = s.schoolid
+
+	JOIN attendance att ON att.studentid = s.id
+
+	JOIN attendance_code ac ON ac.id = att.attendance_codeid AND ac.att_code in ('T')
+
+	JOIN cc ON cc.id = att.CCID AND cc.termid in (SELECT tr.id FROM terms tr
+		WHERE tr.schoolid = s.schoolid
+		AND tr.firstday <= SYSDATE
+		AND tr.lastday >= SYSDATE)
+
+	JOIN courses c ON c.course_number = cc.course_number
+
+	JOIN teachers t ON t.id = cc.teacherid
+
+	JOIN sections sec ON cc.sectionid = sec.id
+
+	WHERE s.enroll_status = 0
+		AND s.schoolid = ~(curschoolid)
+
+	GROUP BY sch.abbreviation, t.lastfirst, c.COURSE_NAME, cc.expression, sec.no_of_students
+
+	ORDER BY 6 DESC
+	
+	;alternatecolor]
+	
+    <tr bgcolor="#edf3fe">
+    	<td>~(SCH.ABBREVIATION;t)</td> <!--DUPLICATE this row for each column -->
+     	<td>~(t.lastfirst;t)</td>
+      	<td>~(c.COURSE_NAME;T)</td>
+      	<td>~(cc.expression;T)</td>
+      	<td>~(sec.no_of_students;T)</td>
+       	<td>~(count;L)</td>
+	</tr>
+    [/tlist_sql]
+
+</table>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

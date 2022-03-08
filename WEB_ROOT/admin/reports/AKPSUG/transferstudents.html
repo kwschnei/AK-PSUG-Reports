@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<head>
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/reports/transferstudents.html" -->
+
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/teacherverification.html" -->
+
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/studentlist/feefunctions.html" -->
+
+
+
+
+<title>Transfer Students</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+
+
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt; Transfer Students<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>Transfer Students this Year</h1><!-- start of content and bounding box -->
+<div class="box-round">
+
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<tr bgcolor="#f6f6f6">
+<td align="center">#</td>
+<td align="center">Student</td>
+<td align="center">GL</td>
+<td align="center">Gen</td>
+<td align="center">Exit</td>
+<td align="center">Code</td>
+<td align="center">Comment</td>
+
+
+</tr>
+
+    ~[tlist_sql;SELECT S.LASTFIRST, S.GRADE_LEVEL, S.GENDER, S.EXITDATE, S.EXITCODE, S.EXITCOMMENT
+FROM STUDENTS S
+WHERE S.ENTRYDATE >= (SELECT TR.FIRSTDAY FROM TERMS TR WHERE TR.SCHOOLID = S.SCHOOLID 
+AND TR.FIRSTDAY < = SYSDATE AND TR.LASTDAY >= SYSDATE AND TR.PORTION = 1)
+AND S.EXITDATE < (SELECT TR.LASTDAY FROM TERMS TR WHERE TR.SCHOOLID = S.SCHOOLID 
+AND TR.FIRSTDAY < = SYSDATE AND TR.LASTDAY >= SYSDATE AND TR.PORTION = 1)
+AND S.SCHOOLID = ~(CURSCHOOLID)
+ORDER BY 4 DESC
+        ;alternatecolor]
+    <tr bgcolor="#edf3fe">
+    <td align="LEFT">~(COUNT;-)</td>
+    <td align="LEFT">~(S.LASTFIRST;T)</td>
+    <td align="CENTER">~(S.GRADE_LEVEL;L)</td>
+    <td align="CENTER">~(S.GENDER;T)</td>
+    <td align="center">~(S.EXITDATE;D)</td>
+    <td align="center">~(S.EXITCODE;T)</td>
+    <td align="LEFT">~(S.EXITCOMMENT;T)</td>
+    </tr>
+[/tlist_sql]
+</table>
+<br>
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

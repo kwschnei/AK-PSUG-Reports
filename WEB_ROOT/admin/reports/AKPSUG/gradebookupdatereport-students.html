@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/reports/delinquentteacherreport.html" -->
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/teacherverification.html" -->
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/studentlist/feefunctions.html" -->
+
+<title>Gradebook Not Updated - Student Report</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt;Non-updated Student Grades<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>Gradebook Not Updated - Student Report</h1><!-- start of content and bounding box -->
+<div class="box-round">
+
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<tr bgcolor="#f6f6f6">
+<td align="left">Student</td>
+<td align="left">Teacher</td>
+<td align="left">Course</td>
+<td align="left">Section</td>
+<td align="left">Last Updated</td>
+
+
+
+
+</tr>
+
+     ~[tlist_sql;SELECT DISTINCT S.LASTFIRST, T.LASTFIRST, C.COURSE_NAME, CC.SECTION_NUMBER, CASE WHEN CC.LASTGRADEUPDATE < (SELECT TRX.FIRSTDAY 
+FROM TERMS TRX WHERE TRX.SCHOOLID = CC.SCHOOLID  
+AND TRX.FIRSTDAY < = SYSDATE AND TRX.LASTDAY >= SYSDATE AND TRX.PORTION = 1) 
+THEN 'Never' ELSE TO_CHAR(CC.LASTGRADEUPDATE) END "LASTGRADEUPDATE"
+FROM CC, TEACHERS T, COURSES C, TERMS TR, STUDENTS S
+WHERE T.ID = CC.TEACHERID
+AND C.COURSE_NUMBER = CC.COURSE_NUMBER
+AND TR.ID = CC.TERMID 
+AND S.ID = CC.STUDENTID
+AND TR.SCHOOLID = CC.SCHOOLID
+AND CC.TERMID IN (SELECT TRX.ID 
+FROM TERMS TRX WHERE TRX.SCHOOLID = CC.SCHOOLID  
+AND TRX.FIRSTDAY < = SYSDATE AND TRX.LASTDAY >= SYSDATE)
+AND CC.LASTGRADEUPDATE < SYSDATE-8
+AND CC.SCHOOLID = ~(CURSCHOOLID)
+AND C.COURSE_NAME NOT LIKE 'Advisory%'
+AND C.COURSE_NAME NOT LIKE 'Guided%'
+AND C.COURSE_NUMBER NOT LIKE 'STUDY'
+AND C.COURSE_NUMBER NOT LIKE 'ELEMAM'
+AND C.COURSE_NUMBER NOT LIKE 'ELEMPM'
+AND C.COURSE_NAME NOT LIKE 'Behavior%'
+AND C.COURSE_NUMBER NOT LIKE 'caseload'
+AND sec.excludefromstoredgrades != 1
+  AND (c.excludefromstoredgrades = 0 AND sec.excludefromstoredgrades IN (0,2))
+AND S.ENTRYDATE < SYSDATE-15
+ORDER BY 2,3
+
+
+        ;alternatecolor]
+    <tr bgcolor="#edf3fe">
+<td align="LEFT">~(S.LASTFIRST;T)</td>
+<td align="LEFT">~(T.LASTFIRST;T)</td>
+    <td align="LEFT">~(C.COURSE_NAME;T)</td>
+ <td align="LEFT">~(CC.SECTION_NUMBER;T)</td>
+    <td align="CENTER">~(CC.LASTGRADEUPDATE;T)</td>
+
+
+    </tr>
+[/tlist_sql]
+</table>
+<br>
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

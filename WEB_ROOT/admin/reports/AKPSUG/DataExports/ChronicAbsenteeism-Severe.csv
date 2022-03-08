@@ -1,0 +1,35 @@
+"Student Name","Grade Level","Attendance Rate","Days Enrolled","Days Absent"
+~[tlist_sql;
+  	WITH stu_att AS (
+	  SELECT
+	    s.lastfirst AS lastfirst,
+	    s.grade_level AS grade_level,
+	    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate,
+	    SUM(adm.studentmembership) AS membership,
+	    SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+	    
+	  FROM ps_membership_reg adm
+	  
+	  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+	  JOIN students s on s.id=adm.studentid
+	  
+	  WHERE
+	    adm.schoolid IN (~[gpv:school],~[gpv:school]+1,~[gpv:school]-1)
+	    AND adm.yearid=~[gpv:year]
+	    AND adm.calendardate<=SYSDATE
+	    AND (s.enroll_status=0 OR s.exitcode=12)
+	  
+	  GROUP BY s.lastfirst,s.grade_level
+	)
+	
+	SELECT 
+	  lastfirst,
+	  grade_level,
+	  rate||'%',
+	  membership,
+	  absent
+	
+	FROM stu_att WHERE rate<=80
+	
+	ORDER BY lastfirst]"~(name)","~(grade_level)","~(rate)","~(membership)","~(absent)"
+[/tlist_sql]

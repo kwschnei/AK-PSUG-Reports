@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<head>
+
+<title>New Students This Year</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt; New Students This Year<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<h1>New Students this Year</h1><!-- start of content and bounding box -->
+<div class="box-round">
+
+<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+<tr bgcolor="#f6f6f6">
+<td align="left">#</td>
+<td align="left">Student</td>
+<td align="left">Grade</td>
+<td align="left">Entry Date</td>
+<td align="left">Entry Code</td>
+<td align="left">Entry Comment</td>
+<td align="left"># of Classes</td>
+
+</tr>
+
+~[tlist_sql;
+SELECT
+S.LASTFIRST,
+CASE S.GRADE_LEVEL
+	WHEN -2 THEN 'PK'
+	WHEN -1 THEN 'PK'
+	WHEN 0 THEN 'KG'
+	else to_char (s.grade_level)
+	END "Grade",
+S.ENTRYDATE,
+S.ENTRYCODE,
+S.TRANSFERCOMMENT,
+(SELECT COUNT(*) FROM CC
+WHERE CC.STUDENTID = S.ID
+AND CC.TERMID IN (SELECT TRX.ID 
+FROM TERMS TRX WHERE TRX.SCHOOLID = CC.SCHOOLID  
+AND TRX.FIRSTDAY < = SYSDATE AND TRX.LASTDAY >= SYSDATE)) CLASSES
+FROM STUDENTS S
+WHERE S.ENTRYDATE > (SELECT MIN(CD.DATE_VALUE)
+FROM CALENDAR_DAY CD
+WHERE CD.MEMBERSHIPVALUE = 1
+AND CD.DATE_VALUE >= '7/1/' ||(SELECT TO_CHAR(TR.FIRSTDAY, 'YYYY') FROM TERMS TR 
+WHERE TR.SCHOOLID = S.SCHOOLID 
+AND TR.FIRSTDAY < = SYSDATE 
+AND TR.LASTDAY >= SYSDATE AND TR.PORTION = 1)
+AND CD.SCHOOLID = S.SCHOOLID)
+AND S.SCHOOLID = ~(curschoolid)
+ORDER BY S.ENTRYDATE DESC
+
+;alternatecolor]
+    <tr bgcolor="#edf3fe">
+<td align="LEFT">~(COUNT;-)</td>
+    <td align="LEFT">~(S.LASTFIRST;T)</td>
+    <td align="LEFT">~(S.GRADE_LEVEL;T)</td>
+    <td align="LEFT">~(S.ENTRYDATE;D)</td>
+    <td align="LEFT">~(S.ENTRYCODE;T)</td>
+    <td align="LEFT">~(S.TRANSFERCOMMENT;T)</td>
+    <td align="LEFT">~(CLASSES;L)</td>
+    </tr>
+[/tlist_sql]
+</table>
+<br>
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

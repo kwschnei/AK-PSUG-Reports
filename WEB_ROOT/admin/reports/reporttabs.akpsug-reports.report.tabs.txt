@@ -1,0 +1,4 @@
+<!--- Created by Kyle Schneider (kschneider@swrsd.org), Southwest Region School District
+for distribution at the Alaska Society of Technology in Education, 2015 conference. --->
+<li class="~[if.~[gpv:repType]=AKPSUG]selected[/if]" id="AKPSUG">
+			<a href="~[if.~[gpv:repType]=AKPSUG]#[else]/admin/reports/AKPSUGreports.html[/if]">AKPSUG Reports</a>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+<title>Chronic Absenteeism</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt;Chronic Absenteeism<!-- breadcrumb end -->~[wc:admin_navigation_css]
+<!-- start of content and bounding box -->
+<h1>Chronic Absenteeism - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-All.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></h1>
+<div class="box-round">
+	<fieldset>
+		 <legend>Severe Chronic Absenteeism 80% or less Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-Severe.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 <div>
+				<label style="width: 300px">Percentage of Student Body:</label>
+				~[tlist_sql;
+					WITH stu_att AS (
+					  SELECT
+					    s.dcid AS dcid,
+					    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate
+					    
+					  FROM ps_membership_reg adm
+					  
+					  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+					  JOIN students s on s.id=adm.studentid
+					  
+					  WHERE
+					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+						AND adm.yearid=~(curyearid)
+					    AND adm.calendardate<=SYSDATE
+					    AND (s.enroll_status=0 OR s.exitcode=12)
+					  
+					  GROUP BY s.dcid
+					)
+				
+					SELECT 
+						ROUND((SELECT COUNT(dcid) FROM stu_att WHERE rate<=80)/(SELECT COUNT(dcid) FROM stu_att),2)*100||'%'
+	         
+	         		FROM dual
+				]~(percentage)
+				[/tlist_sql]
+			</div>
+		 <table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+			<tr bgcolor="#f6f6f6">
+				<td align="left">Student</td>
+				<td align="left">Grade Level</td>
+				<td align="left">Attendance Rate</td>
+				<td align="center">Days Enrolled</td>
+				<td align="center">Days Absent</td>
+			</tr>
+			~[tlist_sql;
+				WITH stu_att AS (
+				  SELECT
+				    s.lastfirst AS lastfirst,
+				    s.dcid AS dcid,
+				    s.grade_level AS grade_level,
+				    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate,
+				    SUM(adm.studentmembership) AS membership,
+				    SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+				    
+				  FROM ps_membership_reg adm
+				  
+				  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+				  JOIN students s on s.id=adm.studentid
+				  
+				  WHERE
+				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    AND adm.yearid=~(curyearid)
+				    AND adm.calendardate<=SYSDATE
+				    AND (s.enroll_status=0 OR s.exitcode=12)
+				  
+				  GROUP BY s.lastfirst,s.grade_level,s.dcid
+				)
+				
+				SELECT 
+				  dcid,
+				  lastfirst,
+				  grade_level,
+				  rate||'%',
+				  membership,
+				  absent
+				
+				FROM stu_att WHERE rate<=80
+				
+				ORDER BY lastfirst
+			;alternatecolor]
+		    <tr bgcolor="#edf3fe">
+			    <td align="left"><a href="/admin/students/historicalAttendance.html?frn=001~(s.dcid)" target="_blank">~(s.lastfirst)</a></td>
+			    <td align="left">~(s.grade_level)</td>
+			    <td align="left">~(att.rate)</td>
+			    <td align="center">~(att.enrolled)</td>
+			    <td align="center">~(att.absent)</td>
+		    </tr>
+			[/tlist_sql]
+		</table>
+	</fieldset>
+	<fieldset>
+		 <legend>Chronic Absenteeism - 80%-90% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-Chronic.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 <div>
+				<label style="width: 300px">Percentage of Student Body:</label>
+				~[tlist_sql;
+					WITH stu_att AS (
+					  SELECT
+					    s.dcid AS dcid,
+					    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate
+					    
+					  FROM ps_membership_reg adm
+					  
+					  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+					  JOIN students s on s.id=adm.studentid
+					  
+					  WHERE
+					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+						AND adm.yearid=~(curyearid)
+					    AND adm.calendardate<=SYSDATE
+					    AND (s.enroll_status=0 OR s.exitcode=12)
+					  
+					  GROUP BY s.dcid
+					)
+				
+					SELECT 
+						ROUND((SELECT COUNT(dcid) FROM stu_att WHERE rate<=90 AND rate>80)/(SELECT COUNT(dcid) FROM stu_att),2)*100||'%'
+	         
+	         		FROM dual
+				]~(percentage)
+				[/tlist_sql]
+			</div>
+		 <table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+			<tr bgcolor="#f6f6f6">
+				<td align="left">Student</td>
+				<td align="left">Grade Level</td>
+				<td align="left">Attendance Rate</td>
+				<td align="center">Days Enrolled</td>
+				<td align="center">Days Absent</td>
+			</tr>
+			~[tlist_sql;
+				WITH stu_att AS (
+				  SELECT
+				    s.lastfirst AS lastfirst,
+				    s.dcid AS dcid,
+				    s.grade_level AS grade_level,
+				    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate,
+				    SUM(adm.studentmembership) AS membership,
+				    SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+				    
+				  FROM ps_membership_reg adm
+				  
+				  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+				  JOIN students s on s.id=adm.studentid
+				  
+				  WHERE
+				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    AND adm.yearid=~(curyearid)
+				    AND adm.calendardate<=SYSDATE
+				    AND (s.enroll_status=0 OR s.exitcode=12)
+				  
+				  GROUP BY s.lastfirst,s.grade_level,s.dcid
+				)
+				
+				SELECT 
+				  dcid,
+				  lastfirst,
+				  grade_level,
+				  rate||'%',
+				  membership,
+				  absent
+				
+				FROM stu_att WHERE rate<=90 AND rate>80
+				
+				ORDER BY lastfirst
+			;alternatecolor]
+		    <tr bgcolor="#edf3fe">
+			    <td align="left"><a href="/admin/students/historicalAttendance.html?frn=001~(s.dcid)" target="_blank">~(s.lastfirst)</a></td>
+			    <td align="left">~(s.grade_level)</td>
+			    <td align="left">~(att.rate)</td>
+			    <td align="center">~(att.enrolled)</td>
+			    <td align="center">~(att.absent)</td>
+		    </tr>
+			[/tlist_sql]
+		</table>
+	</fieldset>
+	<fieldset>
+		 <legend>At Risk for Chronic Absenteeism - 90%-95% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-AtRisk.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 	<div>
+				<label style="width: 300px">Percentage of Student Body:</label>
+				~[tlist_sql;
+					WITH stu_att AS (
+					  SELECT
+					    s.dcid AS dcid,
+					    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate
+					    
+					  FROM ps_membership_reg adm
+					  
+					  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+					  JOIN students s on s.id=adm.studentid
+					  
+					  WHERE
+					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+						AND adm.yearid=~(curyearid)
+					    AND adm.calendardate<=SYSDATE
+					    AND (s.enroll_status=0 OR s.exitcode=12)
+					  
+					  GROUP BY s.dcid
+					)
+				
+					SELECT 
+						ROUND((SELECT COUNT(dcid) FROM stu_att WHERE rate<=95 AND rate>90)/(SELECT COUNT(dcid) FROM stu_att),2)*100||'%'
+	         
+	         		FROM dual
+				]~(percentage)
+				[/tlist_sql]
+			</div>
+		 <table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+			<tr bgcolor="#f6f6f6">
+				<td align="left">Student</td>
+				<td align="left">Grade Level</td>
+				<td align="left">Attendance Rate</td>
+				<td align="center">Days Enrolled</td>
+				<td align="center">Days Absent</td>
+			</tr>
+			~[tlist_sql;
+				WITH stu_att AS (
+				  SELECT
+				    s.lastfirst AS lastfirst,
+				    s.dcid AS dcid,
+				    s.grade_level AS grade_level,
+				    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate,
+				    SUM(adm.studentmembership) AS membership,
+				    SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+				    
+				  FROM ps_membership_reg adm
+				  
+				  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+				  JOIN students s on s.id=adm.studentid
+				  
+				  WHERE
+				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    AND adm.yearid=~(curyearid)
+				    AND adm.calendardate<=SYSDATE
+				    AND (s.enroll_status=0 OR s.exitcode=12)
+				  
+				  GROUP BY s.lastfirst,s.grade_level,s.dcid
+				)
+				
+				SELECT 
+				  dcid,
+				  lastfirst,
+				  grade_level,
+				  rate||'%',
+				  membership,
+				  absent
+				
+				FROM stu_att WHERE rate<=95 AND rate>90
+				
+				ORDER BY lastfirst
+			;alternatecolor]
+		    <tr bgcolor="#edf3fe">
+			    <td align="left"><a href="/admin/students/historicalAttendance.html?frn=001~(s.dcid)" target="_blank">~(s.lastfirst)</a></td>
+			    <td align="left">~(s.grade_level)</td>
+			    <td align="left">~(att.rate)</td>
+			    <td align="center">~(att.enrolled)</td>
+			    <td align="center">~(att.absent)</td>
+		    </tr>
+			[/tlist_sql]
+		</table>
+	</fieldset>
+	<fieldset>
+		 <legend>Regular Attendees - Greater than 95% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-RegularAttendee.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 	<div>
+				<label style="width: 300px">Percentage of Student Body:</label>
+				~[tlist_sql;
+					WITH stu_att AS (
+					  SELECT
+					    s.dcid AS dcid,
+					    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate
+					    
+					  FROM ps_membership_reg adm
+					  
+					  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+					  JOIN students s on s.id=adm.studentid
+					  
+					  WHERE
+					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+						AND adm.yearid=~(curyearid)
+					    AND adm.calendardate<=SYSDATE
+					    AND (s.enroll_status=0 OR s.exitcode=12)
+					  
+					  GROUP BY s.dcid
+					)
+				
+					SELECT 
+						ROUND((SELECT COUNT(dcid) FROM stu_att WHERE rate>95)/(SELECT COUNT(dcid) FROM stu_att),2)*100||'%'
+	         
+	         		FROM dual
+				]~(percentage)
+				[/tlist_sql]
+			</div>
+		 <table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+			<tr bgcolor="#f6f6f6">
+				<td align="left">Student</td>
+				<td align="left">Grade Level</td>
+				<td align="left">Attendance Rate</td>
+				<td align="center">Days Enrolled</td>
+				<td align="center">Days Absent</td>
+			</tr>
+			~[tlist_sql;
+				WITH stu_att AS (
+				  SELECT
+				    s.lastfirst AS lastfirst,
+				    s.dcid AS dcid,
+				    s.grade_level AS grade_level,
+				    ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)AS rate,
+				    SUM(adm.studentmembership) AS membership,
+				    SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+				    
+				  FROM ps_membership_reg adm
+				  
+				  JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+				  JOIN students s on s.id=adm.studentid
+				  
+				  WHERE
+				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    AND adm.yearid=~(curyearid)
+				    AND adm.calendardate<=SYSDATE
+				    AND (s.enroll_status=0)
+				  
+				  GROUP BY s.lastfirst,s.grade_level,s.dcid
+				)
+				
+				SELECT 
+				  dcid,
+				  lastfirst,
+				  grade_level,
+				  rate||'%',
+				  membership,
+				  absent
+				
+				FROM stu_att WHERE rate>95
+				
+				ORDER BY lastfirst
+			;alternatecolor]
+		    <tr bgcolor="#edf3fe">
+			    <td align="left"><a href="/admin/students/historicalAttendance.html?frn=001~(s.dcid)" target="_blank">~(s.lastfirst)</a></td>
+				<td align="left">~(s.grade_level)</td>
+			    <td align="left">~(att.rate)</td>
+			    <td align="center">~(att.enrolled)</td>
+			    <td align="center">~(att.absent)</td>
+		    </tr>
+			[/tlist_sql]
+		</table>
+	</fieldset>
+<br>
+
+<div class="button-row"></div>
+</div>
+<br>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->

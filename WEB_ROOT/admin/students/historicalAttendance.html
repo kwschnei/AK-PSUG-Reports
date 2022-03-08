@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<!-- start right frame -->
+<head>
+
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/students/modifydata.html" -->
+
+<title>Historical Attendance</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<body>
+
+~[wc:admin_header_frame_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_students.modifydata.start_page]</a> &gt; <a href="home.html?selectstudent=nosearch" target="_top">~[text:psx.html.admin_students.modifydata.student_selection]</a> &gt; Historical Attendance<!-- breadcrumb end -->~[wc:admin_navigation_frame_css]
+
+~[wc:title_student_begin_css]Attendance Rate by Year~[wc:title_student_end_css]
+
+<!-- start of content and bounding box -->
+<div class="box-round">
+	<table border="0" cellspacing="0" cellpadding="4" align="center" background="/images/transparent.gif">
+		<tr bgcolor="#f6f6f6">
+			<td align="left">Year</td>
+			<td align="left">Attendance Rate</td> 
+			<td align="left">Days Enrolled</td> 
+			<td align="left">Days Absent</td>
+		</tr>
+	~[tlist_sql;
+		SELECT
+		  s.dcid,
+		  adm.yearid,
+		  (SELECT MAX(terms.name) FROM terms WHERE terms.portion=1 AND terms.yearid=adm.yearid) AS year,
+		  ROUND((SUM(ada.attendancevalue)/SUM(adm.studentmembership))*100,2)||'%' AS rate,
+		  SUM(adm.studentmembership) AS membership,
+		  SUM(adm.studentmembership)-SUM(ada.attendancevalue) AS absent
+		  
+		FROM ps_membership_reg adm
+		
+		JOIN ps_adaadm_defaults_all ada ON ada.studentid=adm.studentid AND ada.calendardate=adm.calendardate
+		JOIN students s on s.id=adm.studentid
+		
+		WHERE
+		  adm.calendardate<=SYSDATE
+		  AND s.id=~(curstudid)
+		
+		GROUP BY adm.yearid,s.dcid
+		
+		ORDER BY yearid
+	;alternatecolor]
+    	<tr bgcolor="#edf3fe">
+    		<td align="LEFT"><a href="/admin/students/yearlyAttendanceBreakdown.html?frn=001~(s.dcid)&year=~(yearid)&yearname=~(year)">~(year)</a></td>
+    		<td align="LEFT">~(rate)</td>
+    		<td align="LEFT">~(enrolled)</td>
+    		<td align="LEFT">~(absent)</td>
+    	</tr>
+	[/tlist_sql]
+	</table>
+</div>
+<!-- end of content of bounding box -->
+
+~[wc:admin_footer_frame_css]
+</form>
+
+</body>
+</html><!-- end right frame -->
