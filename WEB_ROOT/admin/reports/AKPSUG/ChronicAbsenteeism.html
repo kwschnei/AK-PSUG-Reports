@@ -12,10 +12,10 @@
 
 ~[wc:admin_header_css]<!-- breadcrumb start --><!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_reports.reportsetup.start_page]</a> &gt; <a href="/admin/reports/home.html">~[text:psx.html.admin_reports.reportsetup.reports]</a> &gt; <a href="/admin/reports/AKPSUGreports.html">AKPSUG Reports</a> &gt;Chronic Absenteeism<!-- breadcrumb end -->~[wc:admin_navigation_css]
 <!-- start of content and bounding box -->
-<h1>Chronic Absenteeism - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-All.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></h1>
+<h1>Chronic Absenteeism - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-All.csv?year=~(curyearid)">Download</a></h1>
 <div class="box-round">
 	<fieldset>
-		 <legend>Severe Chronic Absenteeism 80% or less Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-Severe.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 <legend>Severe Chronic Absenteeism 80% or less Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-Severe.csv?year=~(curyearid)">Download</a></legend>
 		 <div>
 				<label style="width: 300px">Percentage of Student Body:</label>
 				~[tlist_sql;
@@ -30,7 +30,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -69,7 +69,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -100,7 +100,7 @@
 		</table>
 	</fieldset>
 	<fieldset>
-		 <legend>Chronic Absenteeism - 80%-90% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-Chronic.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 <legend>Chronic Absenteeism - 80%-90% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-Chronic.csv?year=~(curyearid)">Download</a></legend>
 		 <div>
 				<label style="width: 300px">Percentage of Student Body:</label>
 				~[tlist_sql;
@@ -115,7 +115,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -154,7 +154,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -185,7 +185,7 @@
 		</table>
 	</fieldset>
 	<fieldset>
-		 <legend>At Risk for Chronic Absenteeism - 90%-95% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-AtRisk.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 <legend>At Risk for Chronic Absenteeism - 90%-95% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-AtRisk.csv?year=~(curyearid)">Download</a></legend>
 		 	<div>
 				<label style="width: 300px">Percentage of Student Body:</label>
 				~[tlist_sql;
@@ -200,7 +200,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -239,7 +239,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -270,7 +270,7 @@
 		</table>
 	</fieldset>
 	<fieldset>
-		 <legend>Regular Attendees - Greater than 95% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-RegularAttendee.csv?year=~(curyearid)&school=~(curschoolid)">Download</a></legend>
+		 <legend>Regular Attendees - Greater than 95% Attendance - <a href="/admin/reports/AKPSUG/DataExports/ChronicAbsenteeism-RegularAttendee.csv?year=~(curyearid)">Download</a></legend>
 		 	<div>
 				<label style="width: 300px">Percentage of Student Body:</label>
 				~[tlist_sql;
@@ -285,7 +285,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -324,7 +324,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (~(curschoolid),~(curschoolid)+1,~(curschoolid)-1)
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0)
