@@ -30,7 +30,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -69,7 +69,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -115,7 +115,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -154,7 +154,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -200,7 +200,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -239,7 +239,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -285,7 +285,7 @@
 					  JOIN students s on s.id=adm.studentid
 					  
 					  WHERE
-					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+					    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 						AND adm.yearid=~(curyearid)
 					    AND adm.calendardate<=SYSDATE
 					    AND (s.enroll_status=0 OR s.exitcode=12)
@@ -324,7 +324,7 @@
 				  JOIN students s on s.id=adm.studentid
 				  
 				  WHERE
-				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE school_number=~(curschoolid))))
+				    adm.schoolid IN (SELECT sc.school_number FROM schools sc WHERE (sc.school_number=~(curschoolid) OR sc.alternate_school_number=(SELECT alternate_school_number FROM schools WHERE alternate_school_number!=0 AND school_number=~(curschoolid))))
 				    AND adm.yearid=~(curyearid)
 				    AND adm.calendardate<=SYSDATE
 				    AND (s.enroll_status=0)
