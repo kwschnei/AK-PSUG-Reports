@@ -129,7 +129,8 @@
 			total_students,
 			total_fteval
 			
-		FROM chart]
+		FROM chart
+		ORDER BY grade_level]
 		<span style="display: none;">~(school_abbr) ~(grade_level) ~(student_count) ~(fteval) ~(begin_school) ~(end_school) ~(total_students) ~(total_fteval)</span>
 		~(begin_school;l;if.test=1;then=<tr><td><b>~(school_abbr):</b></td><td>~(total_students;l;if.test=~(total_fteval);then=~(total_students);else=~(total_students)<br />(~(total_fteval));)</td><td>~(student_count) ~(fteval)</td>;else=<td>~(student_count) ~(fteval);)
 	~(end_school;l;if.test=1;then=</tr>;else=;)
