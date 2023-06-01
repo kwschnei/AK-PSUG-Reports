@@ -46,7 +46,7 @@ for distribution at the Alaska Society of Technology in Education, 2015 conferen
 
 	JOIN attendance att ON att.studentid = s.id
 
-	JOIN attendance_code ac ON ac.id = att.attendance_codeid AND ac.att_code in ('T')
+	JOIN attendance_code ac ON ac.id = att.attendance_codeid AND ac.att_code in ('T','TU')
 
 	JOIN cc ON cc.id = att.CCID AND cc.termid in (SELECT tr.id FROM terms tr
 		WHERE tr.schoolid = s.schoolid
