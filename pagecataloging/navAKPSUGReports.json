@@ -1,0 +1,24 @@
+{
+	"pages": [
+		{
+		"htmlID": "navAKPSUGReports",
+		"title": "AKPSUG Reports",
+		"sortOrder": 90,
+		"pageURL": "/admin/reports/AKPSUGreports.html",
+		"districtLevelContext": 0,
+		"contextType": "main",
+		"version": "1.40",
+		"parentHTMLID": "navDataAndReportingSection"
+		},
+		{
+		"htmlID": "navAKPSUGHistoricalAttendance",
+		"parentHTMLID": "navStudentAttendanceSection",
+		"title": "Historica Attendance",
+		"pageURL": "/admin/students/historicalAttendance.html?frn=~(studentfrn)",
+		"sortOrder": "150",
+		"contextType": "student",
+		"requireContext": "student",
+		"version": "1.40"
+		}
+	]
+}
