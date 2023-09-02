@@ -13,12 +13,12 @@
 		{
 		"htmlID": "navAKPSUGHistoricalAttendance",
 		"parentHTMLID": "navStudentAttendanceSection",
-		"title": "Historica Attendance",
+		"title": "Historical Attendance",
 		"pageURL": "/admin/students/historicalAttendance.html?frn=~(studentfrn)",
 		"sortOrder": "150",
 		"contextType": "student",
 		"requireContext": "student",
-		"version": "1.40"
+		"version": "1.41"
 		}
 	]
 }
