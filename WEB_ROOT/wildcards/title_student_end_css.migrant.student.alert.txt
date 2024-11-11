@@ -1,1 +1,1 @@
-~[if.~([01]ak_migrant)=Y] <img src="/images/alert_migrant.gif" height="24" width="31" alt="Migrant Alert" border="0">[/if]
+~[if.~([01]ak_migrant)=Y] <img src="/images/alert_migrant.gif" height="24" width="31" alt="Migrant Alert" title="Migrant" border="0">[/if]
