@@ -51,7 +51,7 @@ for distribution at the Alaska Society of Technology in Education, 2015 conferen
     SELECT
       adm.studentid,
       adm.schoolid,
-      s.grade_level,
+      adm.grade_level,
       SUM(adm.studentmembership) AS membership,
       SUM(ada.attendancevalue) AS attendance
 
@@ -67,23 +67,34 @@ for distribution at the Alaska Society of Technology in Education, 2015 conferen
       AND adm.calendardate>=tr.firstday
       AND adm.calendardate<=tr.lastday
   
-    GROUP BY adm.studentid,adm.schoolid,s.grade_level
+    GROUP BY adm.studentid,adm.schoolid,adm.grade_level
   )
 
 SELECT
-  grade_level AS "Grade Level",
+  grade_level,
+  TO_CHAR(grade_level) AS "Grade Level",
   ROUND((SUM(admada.attendance)/SUM(admada.membership))*100,2)||'%' AS "Attendance Rate"
   
 FROM admada
 
 GROUP BY grade_level
 
-ORDER BY grade_level
+UNION
+
+SELECT
+	99,
+	'<b>Schoolwide</b>',
+	'<b>'||ROUND((SUM(admada.attendance)/SUM(admada.membership))*100,2)||'%</b>' AS "Attendance Rate"
+
+FROM admada
+
+ORDER BY 1
 		;alternatecolor]
     
     	<tr bgcolor="#edf3fe">
-    		<td align="LEFT">~(grade_level;l)</td>
-    		<td align="LEFT">~(attendance_rate;t)</td>
+    		<td style="display:none">~(sort)</td>
+    		<td align="LEFT">~(grade_level)</td>
+    		<td align="LEFT">~(attendance_rate)</td>
 		</tr>
 	[/tlist_sql]
 	</table>
