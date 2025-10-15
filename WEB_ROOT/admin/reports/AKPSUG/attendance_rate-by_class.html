@@ -49,12 +49,15 @@ ccdata AS (
   SELECT
     cc.id,
     cc.schoolid,
-    cc.sectionid,    
+    ABS(cc.sectionid) sectionid,    
     cc.currentabsences,
     (SELECT COUNT (cd.id) FROM calendar_day cd WHERE cd.date_value<=termdates.dateleft AND cd.date_value>=termdates.dateenrolled AND cd.schoolid=cc.schoolid AND cd.membershipvalue!=0) AS daysinclass
   
   FROM cc
   INNER JOIN termdates ON termdates.id=cc.id
+  JOIN sections sec ON sec.id=ABS(cc.sectionid)
+  
+  WHERE NVL(sec.exclude_ada,0)!=1
 ),
 
 section_data AS (
