@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://plugin.powerschool.pearson.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" description="System Reports created for the Alaska PowerSchool User's Grou" name="AKPSUG Reports" version="2025.10.15" xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
-<oauth/>
+<?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://plugin.powerschool.pearson.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" description="System Reports created for the Alaska PowerSchool User's Grou" name="AKPSUG Reports" version="2026.08.27" xsi:schemaLocation="http://plugin.powerschool.pearson.com plugin.xsd">
 <publisher name="Kyle Schneider (Southwest Region School District)">
 <contact email="kschneider@swrsd.org"/>
 </publisher>
