@@ -99,36 +99,41 @@
 			WHERE   TO_DATE('~[gpv:date]','MM/DD/YYYY') BETWEEN pe.entrydate AND pe.exitdate -1
 			GROUP BY pe.schoolid,pe.grade_level
 		),
+		gl AS (
+			SELECT  DISTINCT
+					grade_level
+			FROM    students s
+			JOIN    schools sch
+			ON      s.schoolid = sch.school_number
+			WHERE   s.grade_level BETWEEN sch.low_grade AND sch.high_grade
+		),
 		chart AS (
 			SELECT
 			  'Totals' AS label,
-			  sc.grade_level,
+			  gl.grade_level,
 			  SUM(sc.student_count) AS scount,
 			  CASE 
 				WHEN nvl(SUM(sc.student_count),0) <> nvl(SUM(sc.fteval),0) 
 				THEN'<br />(' || nvl(SUM(sc.fteval),0) || ')' 
 			  END AS fteval,
-			  sc.grade_level+3 AS start_school,
-			  13-sc.grade_level AS end_school,
+			  ROW_NUMBER() OVER (ORDER BY gl.grade_level) AS start_school,
+			  ROW_NUMBER() OVER (ORDER BY gl.grade_level DESC) AS end_school,
 			  (SELECT SUM(student_count) FROM studentcounts) AS total_students,
 			  (SELECT SUM(fteval) FROM studentcounts) AS total_fteval
-  
-			FROM studentcounts sc
-
-			GROUP BY sc.grade_level
-
-			ORDER BY sc.grade_level
+			FROM gl
+			LEFT OUTER JOIN studentcounts sc
+			ON sc.grade_level = gl.grade_level
+			GROUP BY gl.grade_level
 		)
 		SELECT
 			label,
 			grade_level,
 			scount,
 			fteval,
-			rownum,
-			(SELECT MAX(rownum) FROM chart)-rownum+1,
+			start_school,
+			end_school,
 			total_students,
 			total_fteval
-			
 		FROM chart
 		ORDER BY grade_level]
 		<span style="display: none;">~(school_abbr) ~(grade_level) ~(student_count) ~(fteval) ~(begin_school) ~(end_school) ~(total_students) ~(total_fteval)</span>
